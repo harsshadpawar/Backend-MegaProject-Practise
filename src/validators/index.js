@@ -20,21 +20,33 @@ const userRegisterValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("Password is required")
-      .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long")
-      .isStrongPassword()
-      .withMessage("Password is weak"),
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long"),
   ];
 };
 
 const userLoginValidator = () => {
   return [
-    body("email").isEmail().withMessage("Email is invalid"),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("Password must be at least 8 characters long")
+    body("username")
+      .optional()
+      .trim()
       .notEmpty()
-      .withMessage("Password is required"),
+      .withMessage("Username is required")
+      .isLength({ min: 3 })
+      .withMessage("Username must be at least 3 characters long"),
+    body("email")
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Email is invalid"),
+    body().custom((value) => {
+      if (!value.username && !value.email) {
+        throw new Error("Identifier (username or email) is required");
+      }
+      return true;
+    }),
   ];
 };
 

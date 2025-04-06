@@ -1,75 +1,47 @@
-import { asyncHandler } from "../utils/async-handler.js";
-import { ApiResponse } from "../utils/api-response.js";
+const getProjects = async (req, res) => {
+  // get all projects
+};
 
-const getProjects = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
+const getProjectById = async (req, res) => {
+  // get project by id
+};
 
-  //validation
-});
+const createProject = async (req, res) => {
+  // create project
+};
 
-const getProjectById = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
+const updateProject = async (req, res) => {
+  // update project
+};
 
-  //validation
-});
+const deleteProject = async (req, res) => {
+  // delete project
+};
 
-const createProject = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
+const getProjectMembers = async (req, res) => {
+  // get project members
+};
 
-  //validation
-});
+const addMemberToProject = async (req, res) => {
+  // add member to project
+};
 
-const updateProject = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
+const deleteMember = async (req, res) => {
+  // delete member from project
+};
 
-  //validation
-});
-
-const deleteProject = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  //validation
-});
-
-const addMemberToProject = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  //validation
-});
-
-const getProjectMembers = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  //validation
-});
-
-const updateProjectMembers = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  //validation
-});
-
-const updateMemberRole = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  //validation
-});
-
-const deleteMember = asyncHandler(async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  //validation
-});
+const updateMemberRole = async (req, res) => {
+  // update member role
+};
 
 export {
-  getProjects,
-  getProjectById,
-  createProject,
-  updateProject,
-  deleteProject,
   addMemberToProject,
-  getProjectMembers,
-  updateProjectMembers,
-  updateMemberRole,
+  createProject,
   deleteMember,
+  deleteProject,
+  getProjectById,
+  getProjectMembers,
+  getProjects,
+  updateMemberRole,
+  updateProject,
 };

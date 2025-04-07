@@ -7,7 +7,7 @@ dotenv.config({
 });
 
 const PORT = process.env.PORT || 3000;
-
+process.setMaxListeners(15);
 //cpnnecting to DB
 connectDB()
   .then(() => {

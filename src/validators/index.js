@@ -50,4 +50,23 @@ const userLoginValidator = () => {
   ];
 };
 
+const currentUserValidator = () => {
+  return [
+    body("email")
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Email is invalid"),
+    body("username")
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage("Username is required")
+      .isLength({ min: 3 })
+      .withMessage("Username must be at least 3 characters long"),
+  ];
+};
+
 export { userRegisterValidator, userLoginValidator };

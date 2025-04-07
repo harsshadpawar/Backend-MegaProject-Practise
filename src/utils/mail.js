@@ -1,9 +1,21 @@
 import mailgen from "mailgen";
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 
+dotenv.config({
+  path: "./.env",
+});
 //mailgen configurations
 const sendMail = async (options) => {
-  const mailGenerator = mailgen({
+  console.log("Starting email send process");
+  console.log("SMTP Configuration:", {
+    host: process.env.MAILTRAP_SMTP_HOST,
+    port: process.env.MAILTRAP_SMTP_PORT,
+    // Don't log actual credentials, just check if they exist
+    hasUser: !!process.env.MAILTRAP_SMTP_USER,
+    hasPassword: !!process.env.MAILTRAP_SMTP_PASSWORD,
+  });
+  const mailGenerator = new mailgen({
     theme: "default",
     product: {
       name: "Mailgen",
@@ -36,7 +48,10 @@ const sendMail = async (options) => {
   };
 
   try {
-    await transporter.sendMail(mail);
+    console.log("Attempting to send email to:", options.email);
+    const result = await transporter.sendMail(mail);
+    console.log("Email sent successfully:", result.messageId);
+    return result;
   } catch (error) {
     console.error("Error sending email", error);
   }
@@ -53,6 +68,25 @@ const emailVerificationMailGenContent = (username, verficationUrl) => {
         button: {
           color: "#22BC66",
           text: "Verify your email account",
+          link: verficationUrl,
+        },
+      },
+      outro:
+        "Need help, or have questions? Just reply to this email, we'd love to help.",
+    },
+  };
+};
+
+const resendemailVerificationMailGenContent = (username, verficationUrl) => {
+  return {
+    body: {
+      name: username,
+      intro: "Welcome to App! Kindly verify your email.",
+      action: {
+        instructions: "To get started with App, please click here:",
+        button: {
+          color: "#22BC66",
+          text: "Verify email reminder.",
           link: verficationUrl,
         },
       },
@@ -97,3 +131,10 @@ sendMail({
 });
 
 */
+
+export {
+  sendMail,
+  emailVerificationMailGenContent,
+  forgotPasswordMailGenContent,
+  resendemailVerificationMailGenContent,
+};

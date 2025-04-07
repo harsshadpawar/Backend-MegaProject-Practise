@@ -13,8 +13,8 @@ use backendDB
 
 # delete commnad
 
-db.user.deleteOne({ email: "harsshad.pawar@gmail.com" })
+db.user.deleteOne({ email: "<email>" })
 
 # check :
 
-db.user.findOne({ email: "harsshad.pawar@gmail.com" })
+db.user.findOne({ email: "<email>" })

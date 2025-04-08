@@ -8,6 +8,9 @@ import {
   verifyEmail,
   resendEmailVerification,
   refreshAccessToken,
+  forgotPasswordRequest,
+  resetForgottenPassword,
+  changeCurrentPassword,
 } from "../controllers/auth.controllers.js";
 
 import { validate } from "../middlewares/validator.middleware.js";
@@ -26,5 +29,8 @@ router.route("/me").get(verifyJWT, getCurrentUser);
 router.route("/verify-email").get(verifyEmail);
 router.route("/resend-verification").post(resendEmailVerification);
 router.route("/refresh-token").post(refreshAccessToken);
+router.route("/forgot-password").post(forgotPasswordRequest);
+router.route("/reset-password").post(resetForgottenPassword);
+router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
 export default router;

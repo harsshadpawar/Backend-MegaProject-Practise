@@ -11,6 +11,7 @@ import {
   sendMail,
   emailVerificationMailGenContent,
   resendemailVerificationMailGenContent,
+  forgotPasswordMailGenContent,
 } from "../utils/mail.js";
 
 import ms from "ms";
@@ -354,28 +355,145 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   });
 });
 
-/*
-const resetForgottenPassword = asyncHandler(async (req, res) => {
-  const { email, username, password, role } = req.body;
+const forgotPasswordRequest = asyncHandler(async (req, res) => {
+  await validate(req, res, async () => {
+    const { email } = req.body;
 
-  //validation
+    if (!email) {
+      throw new ApiError(400, "Email is required");
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message:
+          "If your email is registered, you will receive a password reset link",
+      });
+    }
+
+    if (
+      user.forgotPasswordExpiry &&
+      user.forgotPasswordExpiry > Date.now() &&
+      user.forgotPasswordExpiry >
+        new Date(Date.now() - ms(process.env.FORGOT_PASSWORD_TOKEN_EXPIRY))
+    ) {
+      return res.status(429).json({
+        success: false,
+        message:
+          "A reset link was recently sent. Please wait before requesting another.",
+      });
+    }
+
+    const forgotPasswordToken = crypto
+      .createHmac("sha256", process.env.FORGOT_PASSWORD_TOKEN_SECRET)
+      .update(crypto.randomBytes(32))
+      .digest("hex");
+    const forgotPasswordExpiry = new Date(
+      Date.now() + ms(process.env.FORGOT_PASSWORD_TOKEN_EXPIRY),
+    );
+
+    user.forgotPasswordToken = forgotPasswordToken;
+    user.forgotPasswordExpiry = forgotPasswordExpiry;
+    await user.save();
+
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${forgotPasswordToken}`;
+
+    try {
+      await sendMail({
+        email: user.email,
+        subject: "Reset your password",
+        MailGenContent: forgotPasswordMailGenContent(user.username, resetUrl),
+      });
+
+      res.status(200).json({
+        success: true,
+        message:
+          "If your email is registered, you will receive a password reset link",
+      });
+    } catch (error) {
+      user.forgotPasswordToken = undefined;
+      user.forgotPasswordExpiry = undefined;
+      await user.save();
+
+      console.error("Failed to send reset email:", error);
+      throw new ApiError(500, "Failed to send password reset email");
+    }
+  });
 });
 
+const resetForgottenPassword = asyncHandler(async (req, res) => {
+  await validate(req, res, async () => {
+    const { token, newPassword } = req.body;
 
-const forgotPasswordRequest = asyncHandler(async (req, res) => {
-  const { email, username, password, role } = req.body;
+    if (!token || !newPassword) {
+      throw new ApiError(400, "Token and new password are required");
+    }
 
-  //validation
+    const user = await User.findOne({
+      forgotPasswordToken: token,
+      forgotPasswordExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      throw new ApiError(400, "Invalid or expired token");
+    }
+
+    user.password = newPassword;
+    user.forgotPasswordToken = undefined;
+    user.forgotPasswordExpiry = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  });
 });
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
-  const { email, username, password, role } = req.body;
+  await validate(req, res, async () => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id; // From auth middleware
 
-  //validation
+    if (!currentPassword || !newPassword) {
+      throw new ApiError(400, "Current password and new password are required");
+    }
+
+    // Get user with password
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new ApiError(401, "Current password is incorrect");
+    }
+
+    // Update password
+    user.password = newPassword; // Assuming password hashing happens in pre-save hook
+    await user.save();
+
+    // Optional: Clear any existing sessions
+    user.refreshToken = undefined;
+    await user.save();
+
+    res.clearCookie("token");
+    res.clearCookie("refreshToken");
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully. Please login again.",
+    });
+  });
 });
-
-
-*/
 
 export {
   registerUser,
@@ -385,4 +503,7 @@ export {
   verifyEmail,
   resendEmailVerification,
   refreshAccessToken,
+  forgotPasswordRequest,
+  resetForgottenPassword,
+  changeCurrentPassword,
 };

@@ -31,7 +31,9 @@ router.route("/register").post(
   uploadAvatar, // Step 1: Handle file upload
   handleMulterError, // Step 2: Handle upload errors
   (req, res, next) => {
-    console.log("After multer, req.body:", req.body); // Debug middleware
+    if (process.env.NODE_ENV === "development") {
+      console.log("After multer, req.body:", req.body);
+    }
     next();
   },
   userRegisterValidator(), // Step 3: Validate request body
@@ -40,9 +42,9 @@ router.route("/register").post(
 );
 
 router.route("/login").post(userLoginValidator(), validate, loginUser);
-router.route("/logout").get(logoutUser);
+router.route("/logout").get(verifyJWT, logoutUser);
 router.route("/me").get(verifyJWT, getCurrentUser);
-router.route("/verify-email").get(verifyEmail);
+router.route("/verify-email").post(verifyEmail);
 router.route("/resend-verification").post(resendEmailVerification);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/forgot-password").post(forgotPasswordRequest);

@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
+  uploadAvatar,
+  handleMulterError,
+} from "../middlewares/multer.middleware.js";
+import {
   registerUser,
   loginUser,
   logoutUser,
@@ -22,8 +26,20 @@ import {
 
 const router = Router();
 
-router.route("/register").post(userRegisterValidator(), validate, registerUser);
-router.route("/login").get(userLoginValidator(), validate, loginUser);
+//router.route("/register").post(userRegisterValidator(), validate, registerUser);
+router.route("/register").post(
+  uploadAvatar, // Step 1: Handle file upload
+  handleMulterError, // Step 2: Handle upload errors
+  (req, res, next) => {
+    console.log("After multer, req.body:", req.body); // Debug middleware
+    next();
+  },
+  userRegisterValidator(), // Step 3: Validate request body
+  validate, // Step 4: Process validation results
+  registerUser, // Step 5: Process registration
+);
+
+router.route("/login").post(userLoginValidator(), validate, loginUser);
 router.route("/logout").get(logoutUser);
 router.route("/me").get(verifyJWT, getCurrentUser);
 router.route("/verify-email").get(verifyEmail);

@@ -380,7 +380,10 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email });
 
+<<<<<<< HEAD
     // If user doesn't exist, still return success to avoid revealing email existence
+=======
+>>>>>>> main
     if (!user) {
       return res.status(200).json({
         success: true,
@@ -389,10 +392,14 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     // Check if a valid reset token already exists and is not expired
     // and was created recently (rate limiting)
     if (
       user.forgotPasswordToken &&
+=======
+    if (
+>>>>>>> main
       user.forgotPasswordExpiry &&
       user.forgotPasswordExpiry > Date.now() &&
       user.forgotPasswordExpiry >
@@ -405,12 +412,18 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     // Generate new token
+=======
+>>>>>>> main
     const forgotPasswordToken = crypto
       .createHmac("sha256", process.env.FORGOT_PASSWORD_TOKEN_SECRET)
       .update(crypto.randomBytes(32))
       .digest("hex");
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
     const forgotPasswordExpiry = new Date(
       Date.now() + ms(process.env.FORGOT_PASSWORD_TOKEN_EXPIRY),
     );
@@ -434,7 +447,10 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
           "If your email is registered, you will receive a password reset link",
       });
     } catch (error) {
+<<<<<<< HEAD
       // If email fails, clean up the token
+=======
+>>>>>>> main
       user.forgotPasswordToken = undefined;
       user.forgotPasswordExpiry = undefined;
       await user.save();
@@ -477,18 +493,30 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   await validate(req, res, async () => {
     const { currentPassword, newPassword } = req.body;
+<<<<<<< HEAD
     const userId = req.user.id;
+=======
+    const userId = req.user.id; // From auth middleware
+>>>>>>> main
 
     if (!currentPassword || !newPassword) {
       throw new ApiError(400, "Current password and new password are required");
     }
 
+<<<<<<< HEAD
+=======
+    // Get user with password
+>>>>>>> main
     const user = await User.findById(userId);
 
     if (!user) {
       throw new ApiError(404, "User not found");
     }
 
+<<<<<<< HEAD
+=======
+    // Verify current password
+>>>>>>> main
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password,
@@ -497,9 +525,17 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Current password is incorrect");
     }
 
+<<<<<<< HEAD
     user.password = newPassword;
     await user.save();
 
+=======
+    // Update password
+    user.password = newPassword; // Assuming password hashing happens in pre-save hook
+    await user.save();
+
+    // Optional: Clear any existing sessions
+>>>>>>> main
     user.refreshToken = undefined;
     await user.save();
 

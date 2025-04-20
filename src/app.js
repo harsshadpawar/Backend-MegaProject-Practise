@@ -28,7 +28,10 @@ import refreshAccessToken from "./routes/auth.routes.js";
 import forgotPasswordRequest from "./routes/auth.routes.js";
 import resetForgottenPassword from "./routes/auth.routes.js";
 import changeCurrentPassword from "./routes/auth.routes.js";
+<<<<<<< HEAD
 import projectRouter from "./routes/project.routes.js";
+=======
+>>>>>>> main
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -44,6 +47,9 @@ app.use("/api/v1/users", refreshAccessToken);
 app.use("/api/v1/users", forgotPasswordRequest);
 app.use("/api/v1/users", resetForgottenPassword);
 app.use("/api/v1/users", changeCurrentPassword);
+<<<<<<< HEAD
 app.use("/api/v1/projects", projectRouter);
+=======
+>>>>>>> main
 
 export default app;
